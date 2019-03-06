@@ -1,3 +1,3 @@
-## [0.0.1] - TODO: Add release date.
+## [0.1.1] - 2019/3/6
 
-* TODO: Describe initial release.
+Added theme and locale and brightness dynamic change  
