@@ -1,7 +1,6 @@
 # dynamic_app
 
-Dynamically  your theme  and locale 
-
+Dynamically change your theme  and locale 
 
 
 ## How to use
@@ -19,7 +18,7 @@ dynamic_app: ^0.1.1
 $ flutter packages get
 ```
 
-### And finaly import and use it like that 
+#### And finaly import and use it like that 
 
 ```
 import 'package:dynamic_app/dynamic_app.dart';
@@ -45,7 +44,7 @@ return DynamicApp(
     );
 ```
 
-And for changeing theme and brightness and locale use this code's
+And for changeing theme,brightness and locale use this code's
 ```
   void changeBrightness() {
     DynamicApp.of(context).setBrightness(
