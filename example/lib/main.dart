@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dynamic_app/dynamic_app.dart';
 
 void main() => runApp(MyApp());
 
@@ -6,22 +7,25 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+
+    return DynamicApp(
+      defaultLocale: Locale('fa'),
+      defaultBrightness: Brightness.dark,
+      data: (Brightness brightness) => ThemeData(
+        primarySwatch: Colors.indigo,
+        brightness: brightness,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      dynamicWidgetBuilder: (context,theme,locale){
+        return MaterialApp(
+          title: 'Flutter Demo',
+          locale: locale,
+          theme: theme,
+          home: MyHomePage(title: 'Flutter Demo Home Page'),
+        );
+      },
     );
+
+
   }
 }
 
@@ -55,6 +59,24 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+    changeBrightness();
+    changeColor();
+  }
+
+  void changeBrightness() {
+    DynamicApp.of(context).setBrightness(
+        Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark);
+  }
+
+  void changeColor() {
+    DynamicApp.of(context).setThemeData(
+        DynamicApp.of(context).data.copyWith(
+            primaryColor: Theme.of(context).primaryColor == Colors.indigo
+                ? Colors.red
+                : Colors.indigo)
+        );
   }
 
   @override
