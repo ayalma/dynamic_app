@@ -1,6 +1,14 @@
 # dynamic_app
 
-dynamic app 
+Dynamically  your theme  and locale 
+
+
+
+## How to use
+
+### First add dynamic_app to you'r dependencies
+ 
+
 
 ## Getting Started
 
