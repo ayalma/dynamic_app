@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:dynamic_app/dynamic_app.dart';
+import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
@@ -7,12 +7,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return DynamicApp(
       defaultLocale: Locale('fa'),
       defaultBrightness: Brightness.dark,
       data: _buildTheme,
-      dynamicWidgetBuilder: (context,theme,locale){
+      themes: [
+        ThemeData(primaryColor: Colors.yellow),
+        ThemeData(primaryColor: Colors.deepPurpleAccent)
+      ],
+      selectedTheme: 0,
+      dynamicWidgetBuilder: (context, theme, locale) {
         return MaterialApp(
           title: 'Flutter Demo',
           locale: locale,
@@ -21,15 +25,11 @@ class MyApp extends StatelessWidget {
         );
       },
     );
-
-
   }
 
-  Future<ThemeData> _buildTheme(Brightness brightness) {
-    return Future.value(ThemeData(
-      primarySwatch: Colors.indigo,
-      brightness: brightness,
-    ));
+  ThemeData _buildTheme(Brightness brightness, ThemeData theme) {
+    print("this is theme brigh $brightness");
+  return theme.copyWith(primaryColor: (brightness == Brightness.dark)? Colors.black:Colors.indigo,brightness: brightness); //..copyWith(brightness: Brightness.dark);
   }
 }
 
@@ -63,8 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+   // DynamicApp.of(context).selectTheme(_counter % 2);
     changeBrightness();
-    changeColor();
+
+    // changeColor();
   }
 
   void changeBrightness() {
@@ -75,12 +77,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void changeColor() {
-    DynamicApp.of(context).setThemeData(
-        DynamicApp.of(context).data.copyWith(
-            primaryColor: Theme.of(context).primaryColor == Colors.indigo
-                ? Colors.red
-                : Colors.indigo)
-        );
+    DynamicApp.of(context).setThemeData(DynamicApp.of(context).data.copyWith(
+        primaryColor: Theme.of(context).primaryColor == Colors.indigo
+            ? Colors.red
+            : Colors.indigo));
   }
 
   void changeLocale() {

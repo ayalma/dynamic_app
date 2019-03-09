@@ -1,26 +1,34 @@
 import 'dart:async';
+
 import 'package:dynamic_app/src/config.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 typedef DynamicWidgetBuilder = Widget Function(
     BuildContext context, ThemeData data, Locale locale);
-typedef ThemeDataWithBrightnessBuilder = Future<ThemeData> Function(
-    Brightness brightness);
+typedef ThemeDataWithBrightnessBuilder = ThemeData Function(
+    Brightness brightness, ThemeData selectedTheme);
 
 class DynamicApp extends StatefulWidget {
   final DynamicWidgetBuilder dynamicWidgetBuilder;
   final ThemeDataWithBrightnessBuilder data;
+
   final Brightness defaultBrightness;
   final Locale defaultLocale;
+
+  final Iterable<ThemeData> themes;
+  final int selectedTheme;
 
   const DynamicApp(
       {Key key,
       this.dynamicWidgetBuilder,
       this.data,
       this.defaultBrightness,
-      this.defaultLocale})
-      : super(key: key);
+      this.defaultLocale,
+      this.themes,
+      this.selectedTheme = 0})
+      : assert(themes != null),
+        super(key: key);
 
   @override
   DynamicAppState createState() => DynamicAppState();
@@ -33,8 +41,11 @@ class DynamicAppState extends State<DynamicApp> {
   ThemeData _themeData;
   Locale _locale;
   Brightness _brightness;
+  int _selectedTheme;
 
   ThemeData get data => _themeData;
+
+  Iterable<ThemeData> get themes => widget.themes;
 
   Brightness get brightness => _brightness;
 
@@ -47,25 +58,20 @@ class DynamicAppState extends State<DynamicApp> {
     //set defaults
 
     _brightness = widget.defaultBrightness;
+    _selectedTheme = widget.selectedTheme;
 
-    widget.data(_brightness).then((theme){
-      _themeData = theme;
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    _themeData =
+        widget.data(_brightness, widget.themes.elementAt(_selectedTheme));
 
     _locale = widget.defaultLocale;
 
     //load saved
     _loadConfig().then((config) {
       _brightness = config.isDark ? Brightness.dark : Brightness.light;
-       widget.data(_brightness).then((theme){
-         _themeData = theme;
-         if (mounted) {
-           setState(() {});
-         }
-      });
+      _selectedTheme = config.selectedTheme;
+
+      _themeData = widget.data(
+          _brightness, widget.themes.elementAt(config.selectedTheme));
       _locale = Locale(config.languageKey);
 
       if (mounted) {
@@ -75,26 +81,23 @@ class DynamicAppState extends State<DynamicApp> {
   }
 
   @override
-  void didChangeDependencies(){
+  void didChangeDependencies() {
     super.didChangeDependencies();
-     widget.data(_brightness).then((theme){
-       _themeData = theme;
-     });
+    _themeData =
+        widget.data(_brightness, widget.themes.elementAt(_selectedTheme));
   }
 
   @override
   void didUpdateWidget(DynamicApp oldWidget) {
     super.didUpdateWidget(oldWidget);
-    widget.data(_brightness).then((theme){
-      _themeData = theme;
-    });
-    //_themeData = await widget.data(_brightness);
+    _themeData =
+        widget.data(_brightness, widget.themes.elementAt(_selectedTheme));
   }
 
-
   void setBrightness(Brightness brightness) async {
-    this._themeData =  await widget.data(brightness);
-    setState((){
+    _themeData =
+        widget.data(brightness, widget.themes.elementAt(_selectedTheme));
+    setState(() {
       this._brightness = brightness;
     });
 
@@ -108,13 +111,22 @@ class DynamicAppState extends State<DynamicApp> {
       this._locale = Locale(localeKey);
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey,localeKey);
+    await prefs.setString(_localeKey, localeKey);
   }
 
+  @deprecated
   void setThemeData(ThemeData data) {
     setState(() {
       _themeData = data;
     });
+  }
+
+  void selectTheme(int themePosition) async{
+    setState(() {
+      _themeData = widget.data(brightness, widget.themes.elementAt(themePosition));
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_themeKey,themePosition);
   }
 
   @override
@@ -123,6 +135,7 @@ class DynamicAppState extends State<DynamicApp> {
 
   static const String _brightnessKey = "app_brightness";
   static const String _localeKey = "app_locale";
+  static const String _themeKey = "app_theme";
 
   Future<Config> _loadConfig() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -130,6 +143,8 @@ class DynamicAppState extends State<DynamicApp> {
         widget.defaultBrightness == Brightness.dark;
     final String languageKey =
         prefs.getString(_localeKey) ?? widget.defaultLocale.languageCode;
-    return Config(isDark, languageKey);
+
+    final int selectedTheme = prefs.getInt(_themeKey) ?? widget.selectedTheme;
+    return Config(isDark, languageKey, selectedTheme);
   }
 }
