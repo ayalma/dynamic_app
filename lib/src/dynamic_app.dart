@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'package:dynamic_app/src/config.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 typedef DynamicWidgetBuilder = Widget Function(
     BuildContext context, ThemeData data, Locale locale);
-typedef ThemeDataWithBrightnessBuilder = ThemeData Function(
+typedef ThemeDataWithBrightnessBuilder = Future<ThemeData> Function(
     Brightness brightness);
 
 class DynamicApp extends StatefulWidget {
@@ -46,13 +47,25 @@ class DynamicAppState extends State<DynamicApp> {
     //set defaults
 
     _brightness = widget.defaultBrightness;
-    _themeData = widget.data(_brightness);
+
+    widget.data(_brightness).then((theme){
+      _themeData = theme;
+      if (mounted) {
+        setState(() {});
+      }
+    });
+
     _locale = widget.defaultLocale;
 
     //load saved
     _loadConfig().then((config) {
       _brightness = config.isDark ? Brightness.dark : Brightness.light;
-      _themeData = widget.data(_brightness);
+       widget.data(_brightness).then((theme){
+         _themeData = theme;
+         if (mounted) {
+           setState(() {});
+         }
+      });
       _locale = Locale(config.languageKey);
 
       if (mounted) {
@@ -62,23 +75,29 @@ class DynamicAppState extends State<DynamicApp> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies(){
     super.didChangeDependencies();
-    _themeData = widget.data(_brightness);
+     widget.data(_brightness).then((theme){
+       _themeData = theme;
+     });
   }
 
   @override
   void didUpdateWidget(DynamicApp oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _themeData = widget.data(_brightness);
+    widget.data(_brightness).then((theme){
+      _themeData = theme;
+    });
+    //_themeData = await widget.data(_brightness);
   }
 
 
   void setBrightness(Brightness brightness) async {
-    setState(() {
-      this._themeData = widget.data(brightness);
+    this._themeData =  await widget.data(brightness);
+    setState((){
       this._brightness = brightness;
     });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(
         _brightnessKey, brightness == Brightness.dark ? true : false);

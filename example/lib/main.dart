@@ -11,10 +11,7 @@ class MyApp extends StatelessWidget {
     return DynamicApp(
       defaultLocale: Locale('fa'),
       defaultBrightness: Brightness.dark,
-      data: (Brightness brightness) => ThemeData(
-        primarySwatch: Colors.indigo,
-        brightness: brightness,
-      ),
+      data: _buildTheme,
       dynamicWidgetBuilder: (context,theme,locale){
         return MaterialApp(
           title: 'Flutter Demo',
@@ -26,6 +23,13 @@ class MyApp extends StatelessWidget {
     );
 
 
+  }
+
+  Future<ThemeData> _buildTheme(Brightness brightness) {
+    return Future.value(ThemeData(
+      primarySwatch: Colors.indigo,
+      brightness: brightness,
+    ));
   }
 }
 
