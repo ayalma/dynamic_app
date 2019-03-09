@@ -5,4 +5,4 @@ Added theme and locale and brightness dynamic change
 
 ## [0.2.1] - 2019/3/9
 
-Made Theme builder async
+Made Theme builder function async
