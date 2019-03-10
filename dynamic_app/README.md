@@ -10,7 +10,7 @@ Dynamically change your theme  and locale
 
 ``` 
 dependencies:
-dynamic_app: ^0.1.1
+dynamic_app: ^1.0.1
 ```
 
 #### Then install it 
