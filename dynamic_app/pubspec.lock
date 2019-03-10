@@ -29,20 +29,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.14.11"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.2"
-  dynamic_app:
-    dependency: "direct main"
-    description:
-      path: dynamic_app
-      relative: true
-    source: path
-    version: "0.2.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -89,19 +75,12 @@ packages:
     source: hosted
     version: "2.0.1"
   shared_preferences:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.1+1"
-  shared_preferences_widgets:
-    dependency: "direct main"
-    description:
-      path: shared_preferences_widgets
-      relative: true
-    source: path
-    version: "1.0.1"
   sky_engine:
     dependency: transitive
     description: flutter
